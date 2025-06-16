@@ -1,0 +1,43 @@
+import Image from "next/image";
+import Link from "next/link";
+import { PokemonTypeBadge } from "./pokemon-type-badge";
+
+interface PokemonCardProps {
+  name: string;
+  id: number;
+  type: string;
+  image: string;
+}
+
+export function PokemonCard({ name, id, type, image }: PokemonCardProps) {
+  const formattedId = id.toString().padStart(3, "0");
+  const detailPageUrl = `/pokemon/${id}`;
+
+  return (
+    <Link href={detailPageUrl} className="block group">
+      <div className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200 group-hover:scale-105">
+        <div className="flex justify-between items-center mb-3">
+          <PokemonTypeBadge type={type} variant="light" size="sm" />
+          <span className="text-gray-500 font-medium text-sm">
+            #{formattedId}
+          </span>
+        </div>
+
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-20 h-20 flex items-center justify-center">
+            <Image
+              src={image}
+              alt={name}
+              width={80}
+              height={80}
+              className="object-contain group-hover:scale-110 transition-transform duration-200"
+            />
+          </div>
+          <h2 className="font-semibold text-gray-800 capitalize text-center">
+            {name}
+          </h2>
+        </div>
+      </div>
+    </Link>
+  );
+}
