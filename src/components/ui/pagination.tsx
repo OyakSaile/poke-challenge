@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { uiTranslations } from "@/utils/translations";
 
 interface PaginationProps {
   currentPage: number;
@@ -48,25 +49,25 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
   const hasNext = currentPage < totalPages;
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-1 mt-8">
       <button
         onClick={() => navigateToPage(currentPage - 1)}
         disabled={!hasPrevious}
-        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-500 border-gray-300 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed  cursor-pointer"
+        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all text-gray-700 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronLeft className="w-4 h-4" />
-        Anterior
+        {uiTranslations.pagination.previous}
       </button>
 
-      <div className="flex gap-1">
+      <div className="flex items-center gap-1">
         {visiblePages.map((page) => (
           <button
             key={page}
             onClick={() => navigateToPage(page)}
-            className={`px-3 py-2 text-sm font-medium rounded-lg ${
+            className={`w-10 h-10 text-sm font-medium rounded-lg transition-all flex items-center justify-center ${
               page === currentPage
-                ? "text-white bg-black"
-                : "text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
+                ? "bg-gray-900 text-white"
+                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
             }`}
           >
             {page}
@@ -77,9 +78,9 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
       <button
         onClick={() => navigateToPage(currentPage + 1)}
         disabled={!hasNext}
-        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-500 rounded-lg hover:text-gray-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all text-gray-700 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Próximo
+        {uiTranslations.pagination.next}
         <ChevronRight className="w-4 h-4" />
       </button>
     </div>

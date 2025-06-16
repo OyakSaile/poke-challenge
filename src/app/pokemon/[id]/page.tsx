@@ -1,6 +1,11 @@
 import { getPokemonDetailsAction } from "@/app/actions";
 import { PokemonTypeBadge } from "@/components/ui/pokemon-type-badge";
 import { PokemonStat } from "@/types/pokemon";
+import {
+  translatePokemonStat,
+  capitalizeName,
+  uiTranslations,
+} from "@/utils/translations";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
@@ -18,49 +23,42 @@ export async function generateMetadata({
   try {
     const { id } = await params;
     const pokemon = await getPokemonDetailsAction(id);
+    const capitalizedName = capitalizeName(pokemon.name);
 
     return {
-      title: `${
-        pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
-      } (#${pokemon.id.toString().padStart(3, "0")})`,
-      description: `Learn about ${
-        pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
-      }, a ${pokemon.types.join("/")} type Pokémon. Height: ${
-        pokemon.height / 10
-      }m, Weight: ${
+      title: `${capitalizedName} (#${pokemon.id.toString().padStart(3, "0")})`,
+      description: `Conheça ${capitalizedName}, um Pokémon do tipo ${pokemon.types.join(
+        "/"
+      )}. Altura: ${pokemon.height / 10}m, Peso: ${
         pokemon.weight / 10
-      }kg. View stats, abilities and more details.`,
+      }kg. Veja estatísticas, habilidades e mais detalhes.`,
       openGraph: {
-        title: `${
-          pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
-        } - Pokémon Details`,
-        description: `${
-          pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
-        } is a ${pokemon.types.join("/")} type Pokémon`,
+        title: `${capitalizedName} - Detalhes do Pokémon`,
+        description: `${capitalizedName} é um Pokémon do tipo ${pokemon.types.join(
+          "/"
+        )}`,
         images: [
           {
             url: pokemon.image,
             width: 400,
             height: 400,
-            alt: `${pokemon.name} artwork`,
+            alt: `Imagem de ${capitalizedName}`,
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: `${
-          pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
-        } - Pokémon`,
-        description: `${
-          pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
-        } is a ${pokemon.types.join("/")} type Pokémon`,
+        title: `${capitalizedName} - Pokémon`,
+        description: `${capitalizedName} é um Pokémon do tipo ${pokemon.types.join(
+          "/"
+        )}`,
         images: [pokemon.image],
       },
     };
   } catch {
     return {
-      title: "Pokémon Details",
-      description: "View detailed information about this Pokémon",
+      title: "Detalhes do Pokémon",
+      description: "Veja informações detalhadas sobre este Pokémon",
     };
   }
 }
@@ -70,6 +68,7 @@ export default async function PokemonDetailsPage({
 }: PokemonDetailsPageProps) {
   const { id } = await params;
   const pokemon = await getPokemonDetailsAction(id);
+  const capitalizedName = capitalizeName(pokemon.name);
 
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
@@ -78,7 +77,7 @@ export default async function PokemonDetailsPage({
         className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4 md:mb-6"
       >
         <ChevronLeft className="w-4 h-4" />
-        Back to Pokédex
+        {uiTranslations.pokemon.backToPokedex}
       </Link>
 
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -88,7 +87,7 @@ export default async function PokemonDetailsPage({
               <div className="w-full md:w-64 h-64 bg-gray-100 rounded-xl flex items-center justify-center">
                 <Image
                   src={pokemon.image}
-                  alt={pokemon.name}
+                  alt={capitalizedName}
                   width={200}
                   height={200}
                   className="object-contain w-full h-full max-w-[180px] md:max-w-[200px]"
@@ -99,7 +98,7 @@ export default async function PokemonDetailsPage({
             <div className="flex-1 w-full">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4 md:mb-6">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold capitalize">
-                  {pokemon.name}
+                  {capitalizedName}
                 </h1>
                 <span className="text-lg sm:text-xl md:text-2xl text-gray-500">
                   #{pokemon.id.toString().padStart(3, "0")}
@@ -119,7 +118,7 @@ export default async function PokemonDetailsPage({
 
               <div className="space-y-3 md:space-y-4">
                 <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">
-                  Base Stats
+                  {uiTranslations.pokemon.baseStats}
                 </h3>
                 {pokemon.stats.map((stat: PokemonStat) => (
                   <div
@@ -127,7 +126,7 @@ export default async function PokemonDetailsPage({
                     className="flex items-center gap-3 md:gap-4"
                   >
                     <span className="w-20 md:w-24 text-xs md:text-sm font-medium text-gray-600 capitalize">
-                      {stat.name.replace("-", " ")}
+                      {translatePokemonStat(stat.name)}
                     </span>
                     <span className="w-8 md:w-12 text-xs md:text-sm font-bold">
                       {stat.value}
@@ -147,18 +146,18 @@ export default async function PokemonDetailsPage({
               <div className="mt-6 md:mt-8 grid grid-cols-2 gap-3 md:gap-4">
                 <div className="text-center md:text-left">
                   <span className="text-xs md:text-sm font-medium text-gray-600 block">
-                    Height
+                    {uiTranslations.pokemon.height}
                   </span>
                   <p className="text-base md:text-lg font-semibold">
-                    {pokemon.height / 10} m
+                    {pokemon.height / 10} {uiTranslations.units.meters}
                   </p>
                 </div>
                 <div className="text-center md:text-left">
                   <span className="text-xs md:text-sm font-medium text-gray-600 block">
-                    Weight
+                    {uiTranslations.pokemon.weight}
                   </span>
                   <p className="text-base md:text-lg font-semibold">
-                    {pokemon.weight / 10} kg
+                    {pokemon.weight / 10} {uiTranslations.units.kilograms}
                   </p>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { SearchInput } from "@/components/ui/search-input";
 import { PokemonGridSkeleton } from "@/components/ui/skeleton";
 import { getPokemonsAction } from "./actions/get-pokemons";
 import { PokemonWithImage } from "@/types/pokemon";
+import { uiTranslations } from "@/utils/translations";
 import { Suspense } from "react";
 
 interface HomePageProps {
@@ -82,10 +83,10 @@ function EmptyState({
   isSearching: boolean;
   searchQuery: string;
 }) {
-  const title = "No Pokémon found";
+  const title = uiTranslations.search.noResults;
   const message = isSearching
-    ? `No results for "${searchQuery}"`
-    : "Try adjusting your search";
+    ? `${uiTranslations.search.noResultsFor} "${searchQuery}"`
+    : uiTranslations.search.tryAdjusting;
 
   return (
     <div className="text-center py-12">

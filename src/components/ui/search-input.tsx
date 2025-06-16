@@ -11,7 +11,7 @@ interface SearchInputProps {
 }
 
 export function SearchInput({
-  placeholder = "Faça uma busca pelo nome do pokémon",
+  placeholder = "Pesquise por um pokémon",
   className = "",
   defaultValue = "",
 }: SearchInputProps) {
