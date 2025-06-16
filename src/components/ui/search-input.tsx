@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { Search } from "lucide-react";
 
 interface SearchInputProps {
   placeholder?: string;
@@ -10,64 +11,54 @@ interface SearchInputProps {
 }
 
 export function SearchInput({
-  placeholder = "Search Pokémon...",
+  placeholder = "Faça uma busca pelo nome do pokémon",
   className = "",
   defaultValue = "",
 }: SearchInputProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchValue, setSearchValue] = useState(defaultValue);
+  const [searchTerm, setSearchTerm] = useState(defaultValue);
 
-  const updateURL = useCallback(
-    (query: string) => {
-      const params = new URLSearchParams(searchParams);
+  const updateSearchParams = useCallback(
+    (search: string) => {
+      const params = new URLSearchParams(searchParams.toString());
 
-      if (query) {
-        params.set("search", query);
+      if (search.trim()) {
+        params.set("search", search.trim());
       } else {
         params.delete("search");
       }
 
       params.delete("page");
-      router.replace(`/?${params.toString()}`);
+
+      const newUrl = `/?${params.toString()}`;
+      router.push(newUrl);
     },
     [router, searchParams]
   );
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchValue !== defaultValue) {
-        updateURL(searchValue);
+    const timeoutId = setTimeout(() => {
+      if (searchTerm !== defaultValue) {
+        updateSearchParams(searchTerm);
       }
-    }, 300);
+    }, 500);
 
-    return () => clearTimeout(timer);
-  }, [searchValue, updateURL, defaultValue]);
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, updateSearchParams, defaultValue]);
 
   return (
     <div className={`relative ${className}`}>
-      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg
-          className="h-5 w-5 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
-      </div>
       <input
         type="text"
-        value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full px-6 py-4 pr-12 text-gray-700 bg-gray-100 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white placeholder-gray-500"
         placeholder={placeholder}
-        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
       />
+      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+        <Search className="h-5 w-5 text-gray-400" />
+      </div>
     </div>
   );
 }

@@ -11,7 +11,9 @@ export function Header() {
   return (
     <div className="py-[30px] px-[32px] border-b border-gray-200">
       <nav className="flex items-center justify-between">
-        <Image src="/logo.svg" alt="logo" width={100} height={100} />
+        <Link href="/">
+          <Image src="/logo.svg" alt="logo" width={100} height={100} />
+        </Link>
 
         <div>
           <ul className="flex items-center gap-2">

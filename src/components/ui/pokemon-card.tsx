@@ -15,7 +15,7 @@ export function PokemonCard({ name, id, type, image }: PokemonCardProps) {
 
   return (
     <Link href={detailPageUrl} className="block group">
-      <div className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200 group-hover:scale-105">
+      <div className="bg-[#F0F3FF] rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200 group-hover:scale-105">
         <div className="flex justify-between items-center mb-3">
           <PokemonTypeBadge type={type} variant="light" size="sm" />
           <span className="text-gray-500 font-medium text-sm">

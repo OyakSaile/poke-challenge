@@ -1,19 +1,22 @@
 import { PokemonCard } from "@/components/ui/pokemon-card";
 import { Pagination } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search-input";
+import { PokemonGridSkeleton } from "@/components/ui/skeleton";
 import { getPokemonsAction } from "./actions/get-pokemons";
 import { PokemonWithImage } from "@/types/pokemon";
+import { Suspense } from "react";
 
 interface HomePageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     search?: string;
-  };
+  }>;
 }
 
-export default async function Home({ searchParams }: HomePageProps) {
-  const currentPage = Number(searchParams.page) || 1;
-  const searchQuery = searchParams.search || "";
+async function PokemonList({ searchParams }: HomePageProps) {
+  const { page, search } = await searchParams;
+  const currentPage = Number(page) || 1;
+  const searchQuery = search || "";
 
   const pokemonData = await getPokemonsAction({
     page: currentPage,
@@ -26,15 +29,7 @@ export default async function Home({ searchParams }: HomePageProps) {
   const isSearching = searchQuery.length > 0;
 
   return (
-    <div className="p-8">
-      <div className="mb-6">
-        <SearchInput
-          placeholder="Search Pokémon by name..."
-          className="max-w-md"
-          defaultValue={searchQuery}
-        />
-      </div>
-
+    <>
       {hasResults && (
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
           {pokemonList.map((pokemon: PokemonWithImage) => (
@@ -56,6 +51,26 @@ export default async function Home({ searchParams }: HomePageProps) {
       {hasResults && totalPages > 1 && (
         <Pagination currentPage={currentPage} totalPages={totalPages} />
       )}
+    </>
+  );
+}
+
+export default async function Home({ searchParams }: HomePageProps) {
+  const { search } = await searchParams;
+  const searchQuery = search || "";
+
+  return (
+    <div className="p-8">
+      <div className="mb-6 w-full flex justify-center">
+        <SearchInput
+          className="max-w-[720px] w-full"
+          defaultValue={searchQuery}
+        />
+      </div>
+
+      <Suspense fallback={<PokemonGridSkeleton count={12} />}>
+        <PokemonList searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 }

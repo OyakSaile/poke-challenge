@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
   currentPage: number;
@@ -9,179 +9,79 @@ interface PaginationProps {
 }
 
 export function Pagination({ currentPage, totalPages }: PaginationProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
-  if (totalPages <= 1) return null;
-
-  const createPageURL = (page: number) => {
-    const params = new URLSearchParams(searchParams);
+  const navigateToPage = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    return `/?${params.toString()}`;
+    router.push(`/?${params.toString()}`);
   };
 
   const getVisiblePages = () => {
-    const pages = [];
+    const visiblePages = [];
     const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
+        visiblePages.push(i);
       }
     } else {
-      let start = Math.max(1, currentPage - 2);
-      const end = Math.min(totalPages, start + maxVisiblePages - 1);
+      const halfVisible = Math.floor(maxVisiblePages / 2);
+      let startPage = Math.max(1, currentPage - halfVisible);
+      const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-      if (end - start < maxVisiblePages - 1) {
-        start = Math.max(1, end - maxVisiblePages + 1);
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
 
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
+      for (let i = startPage; i <= endPage; i++) {
+        visiblePages.push(i);
       }
     }
 
-    return pages;
+    return visiblePages;
   };
 
-  const canGoPrevious = currentPage > 1;
-  const canGoNext = currentPage < totalPages;
   const visiblePages = getVisiblePages();
+  const hasPrevious = currentPage > 1;
+  const hasNext = currentPage < totalPages;
 
   return (
-    <div className="flex items-center justify-center gap-1 mt-8">
-      <PreviousButton
-        canGoPrevious={canGoPrevious}
-        previousPageUrl={canGoPrevious ? createPageURL(currentPage - 1) : ""}
-      />
+    <div className="flex items-center justify-center gap-2">
+      <button
+        onClick={() => navigateToPage(currentPage - 1)}
+        disabled={!hasPrevious}
+        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-500 border-gray-300 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed  cursor-pointer"
+      >
+        <ChevronLeft className="w-4 h-4" />
+        Anterior
+      </button>
 
-      <div className="flex items-center gap-1">
+      <div className="flex gap-1">
         {visiblePages.map((page) => (
-          <PageButton
+          <button
             key={page}
-            page={page}
-            isCurrentPage={page === currentPage}
-            pageUrl={createPageURL(page)}
-          />
+            onClick={() => navigateToPage(page)}
+            className={`px-3 py-2 text-sm font-medium rounded-lg ${
+              page === currentPage
+                ? "text-white bg-black"
+                : "text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
+            }`}
+          >
+            {page}
+          </button>
         ))}
       </div>
 
-      <NextButton
-        canGoNext={canGoNext}
-        nextPageUrl={canGoNext ? createPageURL(currentPage + 1) : ""}
-      />
-    </div>
-  );
-}
-
-function PreviousButton({
-  canGoPrevious,
-  previousPageUrl,
-}: {
-  canGoPrevious: boolean;
-  previousPageUrl: string;
-}) {
-  const ArrowIcon = () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M15 19l-7-7 7-7"
-      />
-    </svg>
-  );
-
-  if (canGoPrevious) {
-    return (
-      <Link
-        href={previousPageUrl}
-        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all text-gray-700 hover:text-gray-900 hover:bg-gray-100"
-      >
-        <ArrowIcon />
-        Anterior
-      </Link>
-    );
-  }
-
-  return (
-    <span className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed">
-      <ArrowIcon />
-      Anterior
-    </span>
-  );
-}
-
-function PageButton({
-  page,
-  isCurrentPage,
-  pageUrl,
-}: {
-  page: number;
-  isCurrentPage: boolean;
-  pageUrl: string;
-}) {
-  if (isCurrentPage) {
-    return (
-      <span className="w-10 h-10 text-sm font-medium rounded-lg bg-gray-900 text-white flex items-center justify-center">
-        {page}
-      </span>
-    );
-  }
-
-  return (
-    <Link
-      href={pageUrl}
-      className="w-10 h-10 text-sm font-medium rounded-lg transition-all text-gray-700 hover:text-gray-900 hover:bg-gray-100 flex items-center justify-center"
-    >
-      {page}
-    </Link>
-  );
-}
-
-function NextButton({
-  canGoNext,
-  nextPageUrl,
-}: {
-  canGoNext: boolean;
-  nextPageUrl: string;
-}) {
-  const ArrowIcon = () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M9 5l7 7-7 7"
-      />
-    </svg>
-  );
-
-  if (canGoNext) {
-    return (
-      <Link
-        href={nextPageUrl}
-        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+      <button
+        onClick={() => navigateToPage(currentPage + 1)}
+        disabled={!hasNext}
+        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-500 rounded-lg hover:text-gray-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
       >
         Próximo
-        <ArrowIcon />
-      </Link>
-    );
-  }
-
-  return (
-    <span className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed">
-      Próximo
-      <ArrowIcon />
-    </span>
+        <ChevronRight className="w-4 h-4" />
+      </button>
+    </div>
   );
 }

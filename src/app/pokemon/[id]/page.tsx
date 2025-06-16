@@ -4,18 +4,20 @@ import { PokemonStat } from "@/types/pokemon";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
+import { ChevronLeft } from "lucide-react";
 
 interface PokemonDetailsPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({
   params,
 }: PokemonDetailsPageProps): Promise<Metadata> {
   try {
-    const pokemon = await getPokemonDetailsAction(params.id);
+    const { id } = await params;
+    const pokemon = await getPokemonDetailsAction(id);
 
     return {
       title: `${
@@ -66,7 +68,8 @@ export async function generateMetadata({
 export default async function PokemonDetailsPage({
   params,
 }: PokemonDetailsPageProps) {
-  const pokemon = await getPokemonDetailsAction(params.id);
+  const { id } = await params;
+  const pokemon = await getPokemonDetailsAction(id);
 
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
@@ -74,19 +77,7 @@ export default async function PokemonDetailsPage({
         href="/"
         className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4 md:mb-6"
       >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
+        <ChevronLeft className="w-4 h-4" />
         Back to Pokédex
       </Link>
 
