@@ -18,7 +18,8 @@ export function Header() {
         <div>
           <ul className="flex items-center gap-2">
             {NAVIGATION_LINKS.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive =
+                pathname === link.href || pathname.startsWith("/pokemon/");
               return (
                 <li key={link.href}>
                   <Link
